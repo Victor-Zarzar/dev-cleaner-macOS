@@ -83,11 +83,13 @@ clean_xcode_cache() {
     print_section "Cleaning Xcode Cache"
 
     local paths=(
-        "$HOME/Library/Developer/Xcode/DerivedData"
-        "$HOME/Library/Caches/com.apple.dt.Xcode"
-        "$HOME/Library/Developer/Xcode/Archives"
-        "$HOME/Library/Developer/CoreSimulator/Caches"
-        "$HOME/Library/Caches/com.apple.dt.XCPGDeviceSupport"
+        "$HOME/Library/Developer/Xcode/Products"
+        "$HOME/Library/Developer/Xcode/iOS Device Logs"
+        "$HOME/Library/Developer/Xcode/UserData/Previews"
+        "$HOME/Library/Developer/Xcode/DocumentationCache"
+        "$HOME/Library/Developer/CoreSimulator/Devices/*/data/Library/Caches"
+        "$HOME/Library/Developer/CoreSimulator/Devices/*/data/tmp"
+        "$HOME/Library/Logs/CoreSimulator"
     )
 
     for path in "${paths[@]}"; do
