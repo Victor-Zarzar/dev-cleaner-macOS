@@ -1,29 +1,39 @@
 #!/bin/bash
 
 # ============================================
-# Node.js Ecosystem Cleaning Functions (expanded)
+# Node.js Ecosystem Cleaning Functions
 # ============================================
 
 clean_nvm_npm() {
     print_section "Cleaning NPM/NVM Cache"
 
     if [ -d "$HOME/.nvm" ]; then
-        local npm_cache="$HOME/.npm"
-        if [ -d "$npm_cache" ]; then
-            local size
-            size=$(get_folder_size "$npm_cache")
-            size=${size:-0}
+        print_info "NVM found"
+    else
+        print_info "NVM not found (npm cache will still be checked)"
+    fi
+
+    local npm_cache="$HOME/.npm"
+    if [ -d "$npm_cache" ]; then
+        local size
+        size=$(get_folder_size "$npm_cache")
+        size=${size:-0}
+        if [ "$size" -gt 0 ]; then
             rm -rf "$npm_cache" 2>/dev/null && \
                 print_success "npm cache: $(format_bytes $((size * 1024)))"
             TOTAL_CLEANED=$((TOTAL_CLEANED + size))
-        fi
-
-        if command -v npm &>/dev/null; then
-            npm cache clean --force &>/dev/null && print_success "npm cache cleaned"
-            npm cache verify &>/dev/null
+        else
+            print_info "npm cache already clean"
         fi
     else
-        print_info "NVM not found"
+        print_info "npm cache folder not found"
+    fi
+
+    if command -v npm &>/dev/null; then
+        npm cache clean --force &>/dev/null && print_success "npm cache verified/cleaned via CLI"
+        npm cache verify &>/dev/null
+    else
+        print_info "npm CLI not found"
     fi
 
     log_action "NPM/NVM cleaned"
@@ -164,93 +174,6 @@ clean_yarn() {
     log_action "Yarn cache cleaned"
 }
 
-clean_volta() {
-    print_section "Cleaning Volta Cache"
-
-    if command -v volta &>/dev/null; then
-        local total_size=0
-
-        local volta_tmp="$HOME/.volta/tmp"
-        if [ -d "$volta_tmp" ]; then
-            local size
-            size=$(get_folder_size "$volta_tmp")
-            size=${size:-0}
-            if [ "$size" -gt 0 ]; then
-                rm -rf "$volta_tmp"/* 2>/dev/null && \
-                    print_success "Volta tmp: $(format_bytes $((size * 1024)))"
-                total_size=$((total_size + size))
-            fi
-        fi
-
-        local volta_packages="$HOME/.volta/tools/image/packages"
-        if [ -d "$volta_packages" ]; then
-            local size
-            size=$(get_folder_size "$volta_packages")
-            size=${size:-0}
-            print_info "Volta packages: $(format_bytes $((size * 1024))) (keeping — managed by Volta)"
-        fi
-
-        if [ "$total_size" -gt 0 ]; then
-            print_success "Total Volta cleaned: $(format_bytes $((total_size * 1024)))"
-            TOTAL_CLEANED=$((TOTAL_CLEANED + total_size))
-        else
-            print_info "Volta cache already clean"
-        fi
-    else
-        print_info "Volta not found"
-    fi
-
-    log_action "Volta cache cleaned"
-}
-
-clean_turbo() {
-    print_section "Cleaning Turbo Build Cache"
-
-    local total_size=0
-
-    local turbo_global="$HOME/.turbo"
-    if [ -d "$turbo_global" ]; then
-        local size
-        size=$(get_folder_size "$turbo_global")
-        size=${size:-0}
-        if [ "$size" -gt 0 ]; then
-            rm -rf "$turbo_global"/* 2>/dev/null && \
-                print_success "Turbo global cache: $(format_bytes $((size * 1024)))"
-            total_size=$((total_size + size))
-        fi
-    fi
-
-    print_info "Scanning for project turbo caches..."
-    local project_turbo_size=0
-    while IFS= read -r turbo_dir; do
-        local size
-        size=$(get_folder_size "$turbo_dir")
-        size=${size:-0}
-        project_turbo_size=$((project_turbo_size + size))
-    done < <(find "$HOME" -maxdepth 6 -type d -name ".turbo" 2>/dev/null | grep "node_modules\|\.cache")
-
-    if [ "$project_turbo_size" -gt 0 ]; then
-        print_info "Project turbo caches: $(format_bytes $((project_turbo_size * 1024)))"
-        echo -n "Remove project turbo caches? (y/N): "
-        read -r response
-        if [[ "$response" =~ ^[Yy]$ ]]; then
-            find "$HOME" -maxdepth 6 -type d -name ".turbo" 2>/dev/null | \
-                grep "node_modules\|\.cache" | xargs rm -rf 2>/dev/null
-            print_success "Project turbo caches removed"
-            total_size=$((total_size + project_turbo_size))
-        fi
-    fi
-
-    if [ "$total_size" -gt 0 ]; then
-        print_success "Total Turbo cleaned: $(format_bytes $((total_size * 1024)))"
-        TOTAL_CLEANED=$((TOTAL_CLEANED + total_size))
-    else
-        print_info "No Turbo cache found"
-    fi
-
-    log_action "Turbo build cache cleaned"
-}
-
 clean_node_modules() {
     print_section "Cleaning Orphan node_modules"
 
@@ -324,7 +247,5 @@ clean_system_nodejs() {
     clean_pnpm
     clean_bun
     clean_yarn
-    clean_volta
-    clean_turbo
     clean_node_modules
 }

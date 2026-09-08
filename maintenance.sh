@@ -19,8 +19,6 @@ source "$LIB_DIR/system-clean.sh"
 source "$LIB_DIR/docker-clean.sh"
 source "$LIB_DIR/storage-optimize.sh"
 source "$LIB_DIR/restart-macos.sh"
-source "$LIB_DIR/crossover-clean.sh"
-source "$LIB_DIR/expo-clean.sh"
 source "$LIB_DIR/devtools-clean.sh"
 source "$LIB_DIR/assets-clean.sh"
 source "$LIB_DIR/browser-clean.sh"
@@ -48,17 +46,15 @@ show_menu() {
     echo -e "  ${GREEN}7)${NC}  Clean iOS simulator"
     echo -e "  ${GREEN}8)${NC}  Clean iOS firmwares (IPSW)"
     echo -e "  ${GREEN}9)${NC}  Clean Android Studio & Emulator"
-    echo -e "  ${GREEN}10)${NC} Clean Node.js (NPM, PNPM, Bun, Yarn, Volta, Turbo)"
+    echo -e "  ${GREEN}10)${NC} Clean Node.js (NPM, PNPM, Bun, Yarn)"
     echo -e "  ${GREEN}11)${NC} Clean Flutter / Dart / FVM"
-    echo -e "  ${GREEN}12)${NC} Clean Expo & React Native"
-    echo -e "  ${GREEN}13)${NC} Clean dev tools (Homebrew, CocoaPods, Ruby, Python)"
-    echo -e "  ${GREEN}14)${NC} Clean Docker"
-    echo -e "  ${GREEN}15)${NC} Clean CrossOver cache"
-    echo -e "  ${GREEN}16)${NC} Clean browser caches"
-    echo -e "  ${GREEN}17)${NC} Clean IDE caches (JetBrains, VSCode, Zed Editor)"
-    echo -e "  ${GREEN}18)${NC} Clean app caches (Slack, Discord, Spotify...)"
-    echo -e "  ${GREEN}19)${NC} View action log"
-    echo -e "  ${GREEN}20)${NC} Restart macOS"
+    echo -e "  ${GREEN}12)${NC} Clean dev tools (Homebrew, CocoaPods, Ruby, Python)"
+    echo -e "  ${GREEN}13)${NC} Clean Docker"
+    echo -e "  ${GREEN}14)${NC} Clean browser caches"
+    echo -e "  ${GREEN}15)${NC} Clean IDE caches (JetBrains, VSCode, Zed Editor)"
+    echo -e "  ${GREEN}16)${NC} Clean app caches (Slack, Discord, Spotify...)"
+    echo -e "  ${GREEN}17)${NC} View action log"
+    echo -e "  ${GREEN}18)${NC} Restart macOS"
     echo -e "  ${GREEN}0)${NC}  Exit"
     echo ""
     echo -ne "  ${CYAN}→ Choose an option: ${NC}"
@@ -79,11 +75,9 @@ run_full_maintenance() {
     clean_android_studio
     clean_system_nodejs
     clean_flutter_dart
-    clean_expo_react_native
     clean_system_devtools
     optimize_storage
     clean_docker
-    clean_crossover
     cleanup_browser_caches
     cleanup_ide_caches
     cleanup_app_caches
@@ -132,15 +126,13 @@ main() {
             9)  clean_android_studio ;;
             10) clean_system_nodejs ;;
             11) clean_flutter_dart ;;
-            12) clean_expo_react_native ;;
-            13) clean_system_devtools ;;
-            14) clean_docker ;;
-            15) clean_crossover ;;
-            16) cleanup_browser_caches ;;
-            17) cleanup_ide_caches ;;
-            18) cleanup_app_caches ;;
-            19) cat "$LOG_FILE" | less ;;
-            20) restart_macos ;;
+            12) clean_system_devtools ;;
+            13) clean_docker ;;
+            14) cleanup_browser_caches ;;
+            15) cleanup_ide_caches ;;
+            16) cleanup_app_caches ;;
+            17) cat "$LOG_FILE" | less ;;
+            18) restart_macos ;;
             0)
                 print_success "Goodbye!"
                 log_action "Script finished"

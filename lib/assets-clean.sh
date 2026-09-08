@@ -205,15 +205,29 @@ clean_icloud_cache() {
 clean_spotlight_index() {
     print_section "Rebuilding Spotlight Index"
 
+    local data_volume="/System/Volumes/Data"
+
+    print_info "Current indexing status:"
+    mdutil -s "$data_volume" 2>&1 | sed 's/^/  /'
+    echo ""
+
     print_warning "This removes and rebuilds the Spotlight index (~1-2 GB temporarily)."
     print_warning "Search will be unavailable for a few minutes while it rebuilds."
     echo -n "Rebuild Spotlight index? (y/N): "
     read -r response
 
     if [[ "$response" =~ ^[Yy]$ ]]; then
-        sudo mdutil -E / 2>/dev/null && \
-            print_success "Spotlight index queued for rebuild" || \
-            print_warning "Failed — check sudo permissions"
+        local output
+        output=$(sudo mdutil -E "$data_volume" 2>&1)
+        local status=$?
+
+        echo "$output" | sed 's/^/  /'
+
+        if [ $status -eq 0 ] && ! echo "$output" | grep -qi "error"; then
+            print_success "Spotlight index queued for rebuild on $data_volume"
+        else
+            print_warning "Failed — check the output above (often SIP/permissions related)"
+        fi
     else
         print_info "Skipped"
     fi
