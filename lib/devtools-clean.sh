@@ -194,22 +194,7 @@ clean_python() {
         if [ -n "$versions" ]; then
             print_info "Installed Python versions: $(echo "$versions" | tr '\n' ' ')"
             print_info "Current: $current"
-
-            for v in $versions; do
-                if [ "$v" != "$current" ] && [ "$v" != "system" ]; then
-                    local size
-                    size=$(get_folder_size "$pyenv_root/versions/$v")
-                    size=${size:-0}
-                    print_warning "Old Python $v: $(format_bytes $((size * 1024)))"
-                    echo -n "Remove Python $v? (y/N): "
-                    read -r response
-                    if [[ "$response" =~ ^[Yy]$ ]]; then
-                        pyenv uninstall -f "$v" 2>/dev/null && \
-                            print_success "Python $v removed"
-                        total_size=$((total_size + size))
-                    fi
-                fi
-            done
+            print_info "Installed versions are kept as-is (not treated as disposable cache)."
         fi
     fi
 

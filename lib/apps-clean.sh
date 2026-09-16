@@ -4,6 +4,16 @@
 # App Cache Cleaning
 # ============================================
 
+safe_size() {
+    local val
+    val=$(get_folder_size "$1" 2>/dev/null)
+    if [[ "$val" =~ ^[0-9]+$ ]]; then
+        echo "$val"
+    else
+        echo 0
+    fi
+}
+
 cleanup_app_caches() {
     print_section "App Cache Cleaning"
 
@@ -14,7 +24,10 @@ cleanup_app_caches() {
         local size=0
         for dir in "Cache" "Code Cache" "GPUCache" "DawnGraphiteCache" "DawnWebGPUCache" "Crashpad" "logs" "sentry"; do
             local p="$slack_base/$dir"
-            [ -d "$p" ] && size=$((size + $(get_folder_size "$p"))) && rm -rf "$p"/* 2>/dev/null
+            if [ -d "$p" ]; then
+                size=$((size + $(safe_size "$p")))
+                rm -rf "$p"/* 2>/dev/null
+            fi
         done
         TOTAL_CLEANED=$((TOTAL_CLEANED + size))
         cleaned=$((cleaned + 1))
@@ -26,7 +39,7 @@ cleanup_app_caches() {
     local teams_path="$HOME/Library/Containers/com.microsoft.teams2/Data/Library/Caches"
     if [ -d "$HOME/Library/Containers/com.microsoft.teams2" ]; then
         local size
-        size=$(get_folder_size "$teams_path")
+        size=$(safe_size "$teams_path")
         rm -rf "$teams_path"/* 2>/dev/null
         TOTAL_CLEANED=$((TOTAL_CLEANED + size))
         cleaned=$((cleaned + 1))
@@ -38,7 +51,7 @@ cleanup_app_caches() {
     local whatsapp_path="$HOME/Library/Containers/net.whatsapp.WhatsApp/Data/Library/Caches"
     if [ -d "$HOME/Library/Containers/net.whatsapp.WhatsApp" ]; then
         local size
-        size=$(get_folder_size "$whatsapp_path")
+        size=$(safe_size "$whatsapp_path")
         rm -rf "$whatsapp_path"/* 2>/dev/null
         TOTAL_CLEANED=$((TOTAL_CLEANED + size))
         cleaned=$((cleaned + 1))
@@ -50,7 +63,7 @@ cleanup_app_caches() {
     local telegram_path="$HOME/Library/Containers/ru.keepcoder.Telegram.TelegramShare/Data/Library/Caches"
     if [ -d "$HOME/Library/Containers/ru.keepcoder.Telegram.TelegramShare" ]; then
         local size
-        size=$(get_folder_size "$telegram_path")
+        size=$(safe_size "$telegram_path")
         rm -rf "$telegram_path"/* 2>/dev/null
         TOTAL_CLEANED=$((TOTAL_CLEANED + size))
         cleaned=$((cleaned + 1))
@@ -64,7 +77,10 @@ cleanup_app_caches() {
         local size=0
         for dir in "Cache" "Code Cache"; do
             local p="$discord_base/$dir"
-            [ -d "$p" ] && size=$((size + $(get_folder_size "$p"))) && rm -rf "$p"/* 2>/dev/null
+            if [ -d "$p" ]; then
+                size=$((size + $(safe_size "$p")))
+                rm -rf "$p"/* 2>/dev/null
+            fi
         done
         TOTAL_CLEANED=$((TOTAL_CLEANED + size))
         cleaned=$((cleaned + 1))
@@ -80,7 +96,7 @@ cleanup_app_caches() {
         "$HOME/Library/Application Support/Spotify/PersistentCache"
     do
         if [ -d "$path" ]; then
-            spotify_size=$((spotify_size + $(get_folder_size "$path")))
+            spotify_size=$((spotify_size + $(safe_size "$path")))
             rm -rf "$path"/* 2>/dev/null
             spotify_cleaned=true
         fi
@@ -100,7 +116,10 @@ cleanup_app_caches() {
             [ -d "$version_dir" ] || continue
             for dir in "Cache" "DawnGraphiteCache" "DawnWebGPUCache" "GPUCache" "Code Cache" "Shared Dictionary/cache"; do
                 local p="$version_dir/$dir"
-                [ -d "$p" ] && size=$((size + $(get_folder_size "$p"))) && rm -rf "$p"/* 2>/dev/null
+                if [ -d "$p" ]; then
+                    size=$((size + $(safe_size "$p")))
+                    rm -rf "$p"/* 2>/dev/null
+                fi
             done
         done
         TOTAL_CLEANED=$((TOTAL_CLEANED + size))
@@ -113,7 +132,7 @@ cleanup_app_caches() {
     local trello_path="$HOME/Library/Containers/com.atlassian.trello/Data/Library/Caches"
     if [ -d "$HOME/Library/Containers/com.atlassian.trello" ]; then
         local size
-        size=$(get_folder_size "$trello_path")
+        size=$(safe_size "$trello_path")
         rm -rf "$trello_path"/* 2>/dev/null
         TOTAL_CLEANED=$((TOTAL_CLEANED + size))
         cleaned=$((cleaned + 1))
@@ -125,7 +144,7 @@ cleanup_app_caches() {
     local proton_path="$HOME/Library/Containers/ch.protonvpn.mac/Data/Library/Caches"
     if [ -d "$HOME/Library/Containers/ch.protonvpn.mac" ]; then
         local size
-        size=$(get_folder_size "$proton_path")
+        size=$(safe_size "$proton_path")
         rm -rf "$proton_path"/* 2>/dev/null
         TOTAL_CLEANED=$((TOTAL_CLEANED + size))
         cleaned=$((cleaned + 1))

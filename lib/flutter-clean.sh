@@ -129,37 +129,7 @@ clean_flutter_dart() {
                 if [ "$fvm_total_size" -gt 0 ]; then
                     print_info "FVM SDK versions path: $fvm_versions_path"
                     print_info "FVM SDK versions usage: $(format_bytes $((fvm_total_size * 1024)))"
-
-                    du -sh "$fvm_versions_path"/* 2>/dev/null
-
-                    echo -n "Keep only the newest FVM SDK version in this path? (y/N): "
-                    read -r response
-
-                    if [[ "$response" =~ ^[Yy]$ ]]; then
-                        local before_size
-                        before_size=$(get_folder_size "$fvm_versions_path")
-                        before_size=${before_size:-0}
-
-                        (
-                            cd "$fvm_versions_path" 2>/dev/null || exit 0
-                            ls -td */ 2>/dev/null | tail -n +2 | xargs rm -rf 2>/dev/null
-                        )
-
-                        local after_size
-                        after_size=$(get_folder_size "$fvm_versions_path")
-                        after_size=${after_size:-0}
-
-                        local cleaned=$((before_size - after_size))
-
-                        if [ "$cleaned" -gt 0 ]; then
-                            print_success "Old FVM SDK versions removed: $(format_bytes $((cleaned * 1024)))"
-                            total_size=$((total_size + cleaned))
-                        else
-                            print_info "No old FVM SDK versions removed"
-                        fi
-                    else
-                        print_info "FVM SDK versions kept"
-                    fi
+                    print_info "SDK versions are kept as-is (not treated as disposable cache)."
                 fi
             fi
         done
